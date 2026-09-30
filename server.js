@@ -1,23 +1,31 @@
 const express = require("express");
 const fs = require("fs");
+const path = require("path");
 
 const app = express();
 
-app.get("/products", (req, res) => {
-    fs.readFile("code.json", "utf8", (err, data) => {
-        if (err) {
-            return res.status(500).json({
-                error: "Unable to read file"
-            });
-        }
+const pathToFile = path.join(__dirname, "code.json");
 
-        const products = JSON.parse(data);
-        res.json(products);
-    });
+app.get("/products", async (req, res) => {
+    const data = await fs.promises.readFile(pathToFile, "utf8");
+
+    const products = JSON.parse(data);
+    console.log(products);
+    res.json(products);
 });
 
+app.get("/products/:id", async (req, res) => {
+    const data = await fs.promises.readFile(pathToFile, "utf8");
 
+    const products = JSON.parse(data);
+
+    const product = products.find(
+        (item) => item.id === Number(req.params.id)
+    );
+    console.log(product);
+    res.json(product);
+});
 
 app.listen(3000, () => {
-    console.log("Server running on port");
+    console.log("Server running on port 3000");
 });
