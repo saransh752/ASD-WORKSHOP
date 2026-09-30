@@ -1,14 +1,25 @@
 const cache = new Map();
 
+const TTL = 60 * 1000; 
+
 function cacheMiddleware(req, res, next) {
     const key = req.originalUrl;
 
-    if (cache.has(key)) {
-        console.log("Cache hit");
+    const cachedData = cache.get(key);
 
-        res.set("X-Cache", "HIT");
+    if (cachedData) {
+        const age = Date.now() - cachedData.createdAt;
+        if (age < TTL) {
+            console.log("Cache hit");
 
-        return res.json(cache.get(key));
+            res.set("X-Cache", "HIT");
+
+            return res.json(cachedData.data);
+        }
+
+        console.log("Cache expired");
+
+        cache.delete(key);
     }
 
     console.log("Cache miss");
@@ -18,7 +29,10 @@ function cacheMiddleware(req, res, next) {
     const originalJson = res.json.bind(res);
 
     res.json = (data) => {
-        cache.set(key, data);
+        cache.set(key, {
+            data: data,
+            createdAt: Date.now()
+        });
 
         return originalJson(data);
     };
@@ -28,6 +42,7 @@ function cacheMiddleware(req, res, next) {
 
 function clearCache() {
     cache.clear();
+
     console.log("Cache invalidated");
 }
 
@@ -35,3 +50,6 @@ module.exports = {
     cacheMiddleware,
     clearCache
 };
+
+
+
