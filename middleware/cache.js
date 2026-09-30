@@ -1,4 +1,5 @@
-// In-memory caching is handled in database/productDatabase.js.
-// This file exists to match the project folder structure for the workshop.
+function cacheMiddleware(req, res, next) {
+    next();
+}
 
-module.exports = {};
+module.exports = cacheMiddleware;

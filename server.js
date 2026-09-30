@@ -1,65 +1,9 @@
 const express = require("express");
-const fs = require("fs");
-const path = require("path");
+const productRoutes = require("./routes/productRoutes");
 
 const app = express();
 
-const pathToFile = path.join(__dirname, "code.json");
-
-let cache = null;
-
-function readFile() {
-    return new Promise((resolve, reject) => {
-
-        if (cache !== null) {
-            console.log("Cache hit");
-            return resolve(cache);
-        }
-        console.log("Cache miss");
-
-        setTimeout(async () => {
-            try {
-                const data = await fs.promises.readFile(pathToFile, "utf8");
-                 cache = JSON.parse(data);
-
-                resolve(cache);
-
-            } catch (err) {
-                reject(err);
-            }
-        }, 1500);
-    });
-}
-
-app.get("/products", async (req, res) => {
-    try {
-        const products = await readFile();
-
-        console.log(products);
-        res.json(products);
-
-    } catch (err) {
-        console.log(err);
-    }
-});
-
-app.get("/products/:id", async (req, res) => {
-    try {
-        const products = await readFile();
-
-        const id = Number(req.params.id);
-
-        const product = products.find(
-            (item) => item.id === id
-        );
-
-        console.log(product);
-        res.json(product);
-
-    } catch (err) {
-        console.log(err);
-    }
-});
+app.use("/products", productRoutes);
 
 app.listen(3000, () => {
     console.log("Server running on port 3000");

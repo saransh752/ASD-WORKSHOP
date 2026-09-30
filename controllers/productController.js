@@ -10,7 +10,6 @@ async function getProducts(req, res) {
         res.json(products);
     } catch (err) {
         console.log(err);
-        res.status(500).json({ message: "Internal server error" });
     }
 }
 
@@ -26,7 +25,6 @@ async function getProductByIdHandler(req, res) {
         res.json(product);
     } catch (err) {
         console.log(err);
-        res.status(500).json({ message: "Internal server error" });
     }
 }
 
