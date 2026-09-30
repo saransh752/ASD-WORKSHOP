@@ -6,12 +6,24 @@ const app = express();
 
 const pathToFile = path.join(__dirname, "code.json");
 
+let cache = null;
+
 function readFile() {
     return new Promise((resolve, reject) => {
+
+        if (cache !== null) {
+            console.log("Cache hit");
+            return resolve(cache);
+        }
+        console.log("Cache miss");
+
         setTimeout(async () => {
             try {
                 const data = await fs.promises.readFile(pathToFile, "utf8");
-                resolve(data);
+                 cache = JSON.parse(data);
+
+                resolve(cache);
+
             } catch (err) {
                 reject(err);
             }
@@ -21,24 +33,19 @@ function readFile() {
 
 app.get("/products", async (req, res) => {
     try {
-        const data = await readFile();
-
-        const products = JSON.parse(data);
+        const products = await readFile();
 
         console.log(products);
         res.json(products);
 
     } catch (err) {
         console.log(err);
-       
     }
 });
 
 app.get("/products/:id", async (req, res) => {
     try {
-        const data = await readFile();
-
-        const products = JSON.parse(data);
+        const products = await readFile();
 
         const id = Number(req.params.id);
 
@@ -57,5 +64,3 @@ app.get("/products/:id", async (req, res) => {
 app.listen(3000, () => {
     console.log("Server running on port 3000");
 });
-
-
