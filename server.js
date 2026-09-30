@@ -3,6 +3,8 @@ const productRoutes = require("./routes/productRoutes");
 
 const app = express();
 
+app.use(express.json());
+
 app.use("/products", productRoutes);
 
 app.listen(3000, () => {
